@@ -1,4 +1,6 @@
 ﻿using Domain.Entities;
+using Domain.Enums;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -74,10 +76,78 @@ namespace Infraestructura.Productos
 
             return index <= 0 ? null : productos[index];
         }
+        public Producto[] GetProductosByUnidadMedida(UnidadMedida um)
+        {
+            Producto[] tmp = null;
+            if(productos == null)
+            {
+                return tmp;
+            }
+
+            foreach(Producto prod in productos)
+            {
+                if(um == prod.UnidadMedida)
+                {
+                    Add(prod, ref tmp);
+                }
+            }
+            return tmp;
+        }
+
+        public Producto[] GetProductosByVencimiento(DateTime dt)
+        {
+            Producto[] tmp = null;
+            if (productos == null)
+            {
+                return tmp;
+            }
+
+            foreach (Producto prod in productos)
+            {
+                if (prod.FechaDeVencimiento.CompareTo(dt) <= 0)//metodo Compare to, utilizarlo en vez de "prod.FechaDeVencimiento <= dt"
+                {
+                    Add(prod, ref tmp);
+                }
+            }
+                
+
+            return tmp;
+        }
+
+        public Producto[] GetProductosByRangoPrecio(decimal start, decimal end)
+        {
+            Producto[] tmp = null;
+            if (productos == null)
+            {
+                return tmp;
+            }
+
+            foreach(Producto prod in productos)
+            {
+                if(prod.Precio >= start && prod.Precio <= end)
+                {
+                    Add(prod, ref tmp);
+                }
+                
+            }
+            return tmp;
+        }
+
+        public Producto[] GetProductosOrderByPrecio()
+        {
+            Array.Sort(productos, new Producto.ProductoPrecioComparer());
+
+            return productos;
+        }
+
+        public string GetProductosAsJson()
+        {
+            return JsonConvert.SerializeObject(productos);
+        }
         #endregion
 
         #region Private Method
-        private void Add(Producto p, ref Producto[] pds)//ref = cualquier cambio tambien se va a sufriri en el metodo que esta pasando Xde
+        private void Add(Producto p, ref Producto[] pds)//ref = cualquier cambio tambien se va a sufrir en el metodo que esta pasando Xde
         {
             if(pds == null)
             {
